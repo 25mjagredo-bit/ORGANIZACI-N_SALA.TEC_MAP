@@ -1,0 +1,335 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sala de Sistemas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="login-screen" class="screen active">
+    <div class="login-card">
+      <div class="brand">
+        <div class="brand-icon">SS</div>
+        <div>
+          <h1>Sala de Sistemas</h1>
+          <p class="subtitle">Sistema de gestión escolar</p>
+        </div>
+      </div>
+
+      <div class="role-switch">
+        <button id="login-admin" class="role-button active">Profesor</button>
+        <button id="login-user" class="role-button">Estudiante</button>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <div class="panel-block">
+          <label for="login-username">Usuario</label>
+          <input id="login-username" type="text" placeholder="admin o estudiante" required>
+        </div>
+        <div class="panel-block">
+          <label for="login-password">Contraseña</label>
+          <input id="login-password" type="password" placeholder="admin123 o user123" required>
+        </div>
+        <button type="submit" class="primary-btn">Iniciar sesión</button>
+      </form>
+
+      <div class="section">
+        <p class="section-note">¿Nuevo usuario? Regístrate aquí.</p>
+      </div>
+
+      <form id="register-form" class="login-form">
+        <div class="panel-block">
+          <label for="register-username">Usuario nuevo</label>
+          <input id="register-username" type="text" placeholder="Ingrese su usuario" required>
+        </div>
+        <div class="panel-block">
+          <label for="register-password">Contraseña</label>
+          <input id="register-password" type="password" placeholder="Crea una contraseña" required>
+        </div>
+        <div class="panel-block">
+          <label>Rol</label>
+          <select id="register-role">
+            <option value="USUARIO">Estudiante</option>
+            <option value="ADMIN">Profesor</option>
+          </select>
+        </div>
+        <div class="panel-block hidden" id="admin-code-block">
+          <label for="register-admin-code">Código administrador</label>
+          <input id="register-admin-code" type="password" placeholder="Código para crear admin">
+        </div>
+        <button type="submit" class="secondary-btn">Registrarse</button>
+        <p class="login-note">Para registrar un ADMIN necesitas el código correcto.</p>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard-screen" class="screen">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon small">SS</div>
+        <div>
+          <h2>Sala de Sistemas</h2>
+          <p class="subtitle">Sistema de gestión escolar</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <span id="current-role">Modo ADMIN</span>
+        <button id="logout-button" class="ghost-btn">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="side-panel">
+        <button class="nav-button active" data-section="dashboard">Panel Principal</button>
+        <button class="nav-button" data-section="students">Estudiantes</button>
+        <button class="nav-button" data-section="map">Mapa del Salón</button>
+        <button class="nav-button" data-section="activity">Actividad</button>
+        <button class="nav-button" data-section="admin">Administración</button>
+      </aside>
+
+      <main class="main-panel">
+        <section id="dashboard" class="section-card active">
+          <div class="section">
+            <div>
+              <h3>Panel Principal</h3>
+              <p>Bienvenido al sistema. Usa la barra lateral para navegar.</p>
+            </div>
+            <div class="section-note">Los cambios se guardan automáticamente en tu navegador.</div>
+          </div>
+
+          <div class="stats-block">
+            <article class="stat-card">
+              <div>
+                <p>Total estudiantes</p>
+                <span id="stat-total">0</span>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div>
+                <p>Computadores ocupados</p>
+                <span id="stat-occupied">0</span>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div>
+                <p>Computadores libres</p>
+                <span id="stat-free">35</span>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div>
+                <p>Estados activos</p>
+                <span id="stat-active">0</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="card-section">
+            <div class="card-title">
+              <div>
+                <h4>Acciones rápidas</h4>
+                <p class="small-text">Agrega estudiantes, revisa el mapa o configura grados y salones.</p>
+              </div>
+            </div>
+            <div class="quick-actions">
+              <button id="quick-add" class="primary-btn">Agregar estudiante</button>
+              <button id="quick-map" class="secondary-btn">Ver mapa</button>
+              <button id="quick-admin" class="secondary-btn">Administración</button>
+            </div>
+          </div>
+
+          <div class="card-section">
+            <h4>Resumen de salones</h4>
+            <div class="grid-cards" id="grade-summary"></div>
+            <div class="grid-cards" id="room-summary"></div>
+          </div>
+        </section>
+
+        <section id="students" class="section-card">
+          <div class="section">
+            <h3>Tabla de Estudiantes</h3>
+            <p>Busca por nombre, computador o filtra por grado y salón.</p>
+          </div>
+          <div class="panel-block">
+            <div class="search-row">
+              <input id="search-input" type="search" placeholder="Buscar por nombre o computador">
+              <select id="grade-filter"></select>
+              <select id="room-filter"></select>
+              <button id="clear-filters" type="button" class="secondary-btn">Limpiar</button>
+            </div>
+          </div>
+          <div id="table-alert" class="table-alert hidden">⚠ Hay computadores duplicados asignados.</div>
+          <div class="table-wrapper">
+            <table id="student-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Grado</th>
+                  <th>Salón</th>
+                  <th>Computador</th>
+                  <th>Estado</th>
+                  <th>Observaciones</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="admin-actions" class="split-actions">
+            <button id="open-add-modal" class="primary-btn">Agregar estudiante</button>
+            <button id="open-import" class="secondary-btn">Carga masiva</button>
+            <button id="open-admin-panel" class="secondary-btn">Administración</button>
+            <button id="clear-all" class="danger-btn">Eliminar todo</button>
+          </div>
+        </section>
+
+        <section id="map" class="section-card">
+          <div class="section">
+            <h3>Mapa del Salón</h3>
+            <p>Organiza los computadores como cuadros de cada salón.</p>
+          </div>
+          <div class="map-toolbar">
+            <span class="badge badge-info">Activo</span>
+            <span class="badge badge-warning">Inactivo</span>
+            <span class="badge badge-danger">Suspendido</span>
+            <span class="badge badge-free">Libre</span>
+          </div>
+          <div class="room-grid" id="room-map"></div>
+          <div class="stats-block">
+            <article class="stat-card">
+              <div>
+                <p>Total salones</p>
+                <span id="stat-rooms">0</span>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div>
+                <p>Total computadores</p>
+                <span>35</span>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div>
+                <p>Ocupados</p>
+                <span id="stat-occupied-map">0</span>
+              </div>
+            </article>
+            <article class="stat-card">
+              <div>
+                <p>Libres</p>
+                <span id="stat-free-map">35</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="activity" class="section-card">
+          <div class="section">
+            <h3>Registro de Actividad</h3>
+            <p>Eventos recientes del sistema y cambios de datos.</p>
+          </div>
+          <div class="activity-summary">
+            <div class="activity-card">
+              <strong id="activity-count">0</strong>
+              <span>Eventos registrados</span>
+            </div>
+            <button id="clear-activity" class="secondary-btn">Limpiar historial</button>
+          </div>
+          <ul id="activity-log" class="log-list"></ul>
+        </section>
+
+        <section id="admin" class="section-card">
+          <div class="section">
+            <h3>Panel de Administración</h3>
+            <p>Gestiona grados, salones y configuración del sistema.</p>
+          </div>
+          <div class="card-section">
+            <div>
+              <h4>Gestión de grados</h4>
+              <div id="grade-tags" class="tag-list"></div>
+              <div class="tag-form">
+                <input id="new-grade" type="number" placeholder="Ej: 12" min="1">
+                <button id="add-grade" type="button" class="secondary-btn">Agregar grado</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-section">
+            <div>
+              <h4>Gestión de salones</h4>
+              <div id="room-tags" class="tag-list"></div>
+              <div class="tag-form">
+                <input id="new-room" type="number" placeholder="Ej: 6" min="1">
+                <button id="add-room" type="button" class="secondary-btn">Agregar salón</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button id="close-modal" class="modal-close">×</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <template id="student-form-template">
+    <div class="modal-header">
+      <h3 id="modal-title">Agregar estudiante</h3>
+    </div>
+    <form id="student-form" class="login-form">
+      <div class="panel-block">
+        <label>Nombre completo</label>
+        <input name="nombre" type="text" required placeholder="Ej: Juan Pérez">
+      </div>
+      <div class="panel-block">
+        <label>Grado</label>
+        <select name="grado" required></select>
+      </div>
+      <div class="panel-block">
+        <label>Salón</label>
+        <select name="salon" required></select>
+      </div>
+      <div class="panel-block">
+        <label>Número de computador</label>
+        <input name="computador" type="number" min="1" max="35" required placeholder="1 - 35">
+      </div>
+      <div class="panel-block">
+        <label>Estado</label>
+        <select name="estado" required>
+          <option value="Activo">Activo</option>
+          <option value="Inactivo">Inactivo</option>
+          <option value="Suspendido">Suspendido</option>
+        </select>
+      </div>
+      <div class="panel-block">
+        <label>Observaciones</label>
+        <textarea name="observaciones" rows="3" placeholder="Opcional"></textarea>
+      </div>
+      <div class="split-actions">
+        <button type="submit" class="primary-btn">Guardar</button>
+        <button type="button" id="cancel-student" class="secondary-btn">Cancelar</button>
+      </div>
+    </form>
+  </template>
+
+  <template id="import-template">
+    <div class="modal-header">
+      <h3>Carga masiva de estudiantes</h3>
+    </div>
+    <div class="panel-block">
+      <p>Selecciona un archivo CSV con columnas: nombre,grado,salon,computador,estado,observaciones</p>
+      <input id="import-file" type="file" accept=".csv">
+    </div>
+    <div class="split-actions">
+      <button id="import-confirm" class="primary-btn">Importar</button>
+      <button type="button" id="cancel-import" class="secondary-btn">Cancelar</button>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
